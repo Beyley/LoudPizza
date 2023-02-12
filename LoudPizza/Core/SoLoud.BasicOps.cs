@@ -43,6 +43,8 @@ namespace LoudPizza.Core
                 instance.mBusHandle = aBus;
                 instance.Initialize(mPlayIndex);
                 m3dData[ch].init(aSound);
+                
+                instance.TimeInterpolationStopwatch.Start();
 
                 mPlayIndex++;
 
@@ -54,6 +56,7 @@ namespace LoudPizza.Core
 
                 if (aPaused)
                 {
+                    instance.TimeInterpolationStopwatch.Stop();
                     instance.mFlags |= AudioSourceInstance.Flags.Paused;
                 }
 

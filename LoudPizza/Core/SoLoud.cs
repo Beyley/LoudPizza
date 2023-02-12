@@ -329,6 +329,9 @@ namespace LoudPizza.Core
 
                         voice.mStreamTime += buffertime;
                         voice.mStreamPosition += (ulong)(dSamples * voice.mOverallRelativePlaySpeed);
+                        
+                        //Restart the interpolation stopwatch
+                        voice.TimeInterpolationStopwatch.Restart();
 
                         // TODO: this is actually unstable, because mStreamTime depends on the relative
                         // play speed. 

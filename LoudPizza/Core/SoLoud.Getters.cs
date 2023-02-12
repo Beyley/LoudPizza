@@ -316,6 +316,20 @@ namespace LoudPizza.Core
             }
         }
 
+        public Time getInterpolatedTimePosition(Handle aVoiceHandle) 
+        {
+            lock (mAudioThreadMutex) 
+            {
+                AudioSourceInstance? ch = getVoiceRefFromHandle_internal(aVoiceHandle);
+                if (ch == null)
+                {
+                    return 0;
+                }
+
+                return (ch.mStreamPosition / (double)ch.mSamplerate) + ch.TimeInterpolationStopwatch.Elapsed.TotalSeconds / ch.RelativePlaybackSpeed;
+            }
+        }
+        
         /// <summary>
         /// Get current stream position.
         /// </summary>

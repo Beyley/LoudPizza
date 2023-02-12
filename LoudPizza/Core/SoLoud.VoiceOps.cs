@@ -46,10 +46,12 @@ namespace LoudPizza.Core
 
                 if (aPause)
                 {
+                    voice.TimeInterpolationStopwatch.Stop();
                     voice.mFlags |= AudioSourceInstance.Flags.Paused;
                 }
                 else
                 {
+                    voice.TimeInterpolationStopwatch.Start();
                     voice.mFlags &= ~AudioSourceInstance.Flags.Paused;
                 }
             }

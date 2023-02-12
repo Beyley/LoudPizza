@@ -71,6 +71,8 @@ namespace LoudPizza.Sources
         /// <inheritdoc/>
         public virtual float RelativePlaybackSpeed => mOverallRelativePlaySpeed;
 
+        internal Stopwatch TimeInterpolationStopwatch { get; } = new Stopwatch();
+
         public AudioSourceInstance(AudioSource source)
         {
             Source = source ?? throw new ArgumentNullException(nameof(source));
