@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\LoudPizza.Backends.Shared\LoudPizza.Backends.Shared.csproj" />
+      <ProjectReference Include="..\LoudPizza.Vorbis\LoudPizza.Vorbis.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Silk.NET.OpenAL" Version="2.17.0-build3011.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Silk.NET.OpenAL.Extensions.Soft">
+        <HintPath>..\Silk.NET.OpenAL.Extensions.Soft.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

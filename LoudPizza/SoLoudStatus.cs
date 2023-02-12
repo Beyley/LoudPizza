@@ -46,5 +46,10 @@ namespace LoudPizza
         EndOfStream = 8,
 
         PoolExhausted = 9,
-    };
+        
+        /// <summary>
+        /// When no audio device is found and/or no audio device succeeds in being initialized.
+        /// </summary>
+        NoAudioDevice = 10,
+    }
 }
