@@ -39,19 +39,27 @@ public static class Program {
 		AudioStreamer streamer = new AudioStreamer();
 		streamer.Start();
 
-		VorbisReader reader = new VorbisReader("badapple.ogg");
-		reader.Initialize();
+		// VorbisReader reader = new VorbisReader("badapple.ogg");
+		// reader.Initialize();
 
-		VorbisAudioStream   vorbisStream   = new VorbisAudioStream(reader);
+		// VorbisAudioStream   vorbisStream   = new VorbisAudioStream(reader);
+		Mp3Stream           vorbisStream   = new Mp3Stream(soLoud, File.OpenRead("badapple.mp3"), false);
 		StreamedAudioStream streamedStream = new StreamedAudioStream(streamer, vorbisStream);
 		streamer.RegisterStream(streamedStream);
 
 		AudioStream stream = new AudioStream(soLoud, streamedStream);
 
 		Handle handle = soLoud.play(stream);
-		soLoud.setVolume(handle, 0.1f);
+		soLoud.setVolume(handle, 0.05f);
 		soLoud.setLooping(handle, true);
 
+		// while (true) {
+		// 	Time streamTime = soLoud.getInterpolatedTimePosition(handle);
+		// 	Console.WriteLine($"streamTime: {streamTime.Seconds * 1000d}ms");
+		// 	
+		// 	Thread.Sleep(1);
+		// }
+		
 		Console.WriteLine("Press return to exit.");
 		Console.ReadLine();
 

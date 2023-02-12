@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LoudPizza\LoudPizza.csproj" />
+    <ProjectReference Include="..\NLayer\NLayer\NLayer.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 [submodule "NLayer"]
 	path = NLayer
-	url = https://github.com/TechnologicalPizza/NLayer
+	url = https://github.com/TechPizzaDev/NLayer
 [submodule "NVorbis"]
 	path = NVorbis
 	url = https://github.com/TechnologicalPizza/NVorbis

@@ -1,40 +1,106 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using LoudPizza.Core;
 using LoudPizza.Sources;
 using NLayer;
 
 namespace LoudPizza
 {
-    public class Mp3Stream : AudioSource
+    public class Mp3Stream : IAudioStream
     {
-        private Mp3StreamInstance mp3Instance;
+        // private Mp3StreamInstance mp3Instance;
 
         public MpegFile mpegFile;
 
-        public Mp3Stream(Stream stream, bool leaveOpen)
-        {
+        public Mp3Stream(SoLoud soLoud, Stream stream, bool leaveOpen) {
             mpegFile = new MpegFile(stream, leaveOpen);
-
-            mChannels = (uint)mpegFile.Channels;
-            mBaseSamplerate = mpegFile.SampleRate;
+            
+            this.Channels   = (uint)this.mpegFile.Channels;
+            this.SampleRate = (uint)this.mpegFile.SampleRate;
 
             // TODO: allow multiple streams from the intial stream by buffering
-            mp3Instance = new Mp3StreamInstance(this, mpegFile);
+            // mp3Instance = new Mp3StreamInstance(this, mpegFile);
         }
-
-        public override Mp3StreamInstance createInstance()
-        {
-            return mp3Instance;
-            //return new Mp3StreamInstance(this, mpegFile);
+        
+        public void Dispose() {
+            mpegFile.Dispose();
         }
+        
+        public uint Channels {
+            get;
+        }
+        
+        public float SampleRate {
+            get;
+        }
+        
+        public float RelativePlaybackSpeed => 1;
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
+        public unsafe uint GetAudio(Span<float> buffer, uint samplesToRead, uint channelStride) {
+            float*      localBuffer = stackalloc float[(int)samplesToRead];
+            Span<float> localSpan   = new Span<float>(localBuffer, (int)samplesToRead);
+            
+            uint channels   = this.Channels;
+            uint readTarget = samplesToRead * channels;
+            if ((uint)localSpan.Length > readTarget)
+                localSpan = localSpan.Slice(0, (int)readTarget);
+            
+            int samplesRead = this.mpegFile.ReadSamples(localSpan);
+            if (samplesRead == 0)
+                return 0;
+            
+            uint elements = (uint)(samplesRead / channels);
+
+            //copy the data from LRLRLR to LLLRRR
+            for (uint i = 0; i < channels; i++)
             {
-                mp3Instance.Dispose();
-                mpegFile.Dispose();
+                for (uint j = 0; j < elements; j++) {
+                    buffer[(int)(j + i * channelStride)] = localBuffer[i + j * channels];
+                }
             }
-            base.Dispose(disposing);
+
+            return elements;
+        }
+        
+        public bool HasEnded() {
+            return this.mpegFile.EndOfFile;
+        }
+        
+        public bool CanSeek() {
+            return this.mpegFile.CanSeek;
+        }
+        
+        public SoLoudStatus Seek(ulong samplePosition, Span<float> scratch, AudioSeekFlags flags, out ulong resultPosition) {
+            long signedSamplePosition = (long)samplePosition;
+            if (signedSamplePosition < 0)
+            {
+                // resultPosition = (ulong)this.mpegFi?le.SampleCount;
+                resultPosition = 0;
+                return SoLoudStatus.EndOfStream;
+            }
+
+            // TODO: bubble up exceptions?
+            // try
+            // {
+            this.mpegFile.Position = signedSamplePosition;
+            resultPosition = (ulong)this.mpegFile.Position;
+            return SoLoudStatus.Ok;
+            // }
+            // catch (PreRollPacketException)
+            // {
+            //     resultPosition = (ulong)Reader.SamplePosition;
+            //     return SoLoudStatus.FileLoadFailed;
+            // }
+            // catch (SeekOutOfRangeException)
+            // {
+            //     resultPosition = (ulong)Reader.TotalSamples;
+            //     return SoLoudStatus.EndOfStream;
+            // }
+            // catch (Exception)
+            // {
+            //     resultPosition = 0;
+            //     return SoLoudStatus.UnknownError;
+            // }
         }
     }
 }
