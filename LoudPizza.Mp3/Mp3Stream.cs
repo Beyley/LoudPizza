@@ -73,29 +73,32 @@ namespace LoudPizza
         }
         
         public SoLoudStatus Seek(ulong samplePosition, Span<float> scratch, AudioSeekFlags flags, out ulong resultPosition) {
-            long signedSamplePosition = (long)samplePosition;
-            if (signedSamplePosition < 0)
-            {
-                // resultPosition = (ulong)this.mpegFi?le.SampleCount;
-                resultPosition = 0;
-                return SoLoudStatus.EndOfStream;
-            }
-
-            // TODO: bubble up exceptions?
-            // try
-            // {
-            this.mpegFile.Position = signedSamplePosition;
+            this.mpegFile.Position = (long)samplePosition * this.Channels;
             resultPosition = (ulong)this.mpegFile.Position;
+            
             return SoLoudStatus.Ok;
-            // }
-            // catch (PreRollPacketException)
+            // long signedSamplePosition = (long)samplePosition;
+            // if (signedSamplePosition < 0)
             // {
-            //     resultPosition = (ulong)Reader.SamplePosition;
-            //     return SoLoudStatus.FileLoadFailed;
+            //     resultPosition = (ulong)this.mpegFile.Length!;
+            //     return SoLoudStatus.EndOfStream;
             // }
-            // catch (SeekOutOfRangeException)
+            //
+            // // TODO: bubble up exceptions?
+            // try 
             // {
-            //     resultPosition = (ulong)Reader.TotalSamples;
+            //     this.mpegFile.Position = signedSamplePosition;
+            //     resultPosition         = (ulong)this.mpegFile.Position;
+            //     return SoLoudStatus.Ok;
+            // }
+            // catch (InvalidOperationException) 
+            // {
+            //     resultPosition = (ulong)this.mpegFile.Position;
+            //     return SoLoudStatus.NotImplemented;
+            // }
+            // catch (ArgumentOutOfRangeException)
+            // {
+            //     resultPosition = (ulong)this.mpegFile.Length!;
             //     return SoLoudStatus.EndOfStream;
             // }
             // catch (Exception)

@@ -52,6 +52,8 @@ public static class Program {
 		Handle handle = soLoud.play(stream);
 		soLoud.setVolume(handle, 0.05f);
 		soLoud.setLooping(handle, true);
+		//Seek to 60 seconds in (48kHz * 2 channels * 60 seconds)
+		soLoud.seek(handle, (ulong)(vorbisStream.SampleRate * 60), AudioSeekFlags.None);
 
 		// while (true) {
 		// 	Time streamTime = soLoud.getInterpolatedTimePosition(handle);
