@@ -37,8 +37,10 @@ namespace LoudPizza
         public float RelativePlaybackSpeed => 1;
 
         public unsafe uint GetAudio(Span<float> buffer, uint samplesToRead, uint channelStride) {
-            float*      localBuffer = stackalloc float[(int)samplesToRead];
-            Span<float> localSpan   = new Span<float>(localBuffer, (int)samplesToRead);
+            int localBufferSize = (int)(samplesToRead * this.Channels);
+            
+            float*      localBuffer = stackalloc float[localBufferSize];
+            Span<float> localSpan   = new Span<float>(localBuffer, localBufferSize);
             
             uint channels   = this.Channels;
             uint readTarget = samplesToRead * channels;
@@ -51,7 +53,7 @@ namespace LoudPizza
             
             uint elements = (uint)(samplesRead / channels);
 
-            //copy the data from LRLRLR to LLLRRR
+            //Deinterlace the data, as SoLoud wants deinterlaced data, but NLayer gives us interlaced data.
             for (uint i = 0; i < channels; i++)
             {
                 for (uint j = 0; j < elements; j++) {
