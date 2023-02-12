@@ -87,12 +87,11 @@ public unsafe class OpenALBackend : IAudioBackend {
 
 		this._softCallbackBuffer.BufferCallback(
 			this._buffer,
-			BufferFormat.Stereo16,
+			this._bufferFormat,
 			(int)sampleRate,
 			new PfnBufferCallback(BufferCallback),
 			(void*)GCHandle.ToIntPtr(this._this)
 		);
-
 
 		this.SoLoud.postinit_internal(sampleRate, bufferSize, channels);
 		this.SoLoud.mBackendString      = "OpenAL";
