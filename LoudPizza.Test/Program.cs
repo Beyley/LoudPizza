@@ -1,7 +1,7 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
 using LoudPizza.Backends.OpenAL;
+using LoudPizza.Backends.SDL2;
 using LoudPizza.Core;
-using LoudPizza.Modifiers;
 using LoudPizza.Sources;
 using LoudPizza.Sources.Streaming;
 using LoudPizza.Test.Shared;
@@ -23,12 +23,18 @@ public static class Program {
 
 			backend = input switch {
 				'a' => new OpenALBackend(soLoud),
-				's' => throw new NotImplementedException(),
+				's' => new SDL2Backend(soLoud),
 				_   => backend
 			};
 		}
 
-		backend.Init();
+		long timestamp = Stopwatch.GetTimestamp();
+		var  result    = backend.Init();
+		timestamp = Stopwatch.GetTimestamp() - timestamp;
+		Console.WriteLine($"Backend init took {timestamp / (double)Stopwatch.Frequency * 1000}ms");
+
+		if (result != SoLoudStatus.Ok)
+			throw new Exception($"Failed to initialize audio backend! reason: {result}");
 
 		AudioStreamer streamer = new AudioStreamer();
 		streamer.Start();

@@ -26,11 +26,11 @@ public unsafe class OpenALBackend : IAudioBackend {
 	public OpenALBackend(SoLoud soLoud) {
 		this.SoLoud = soLoud;
 	}
-	
+
 	public SoLoud SoLoud {
 		get;
 	}
-	
+
 	public SoLoudStatus Init(uint sampleRate = 48000, uint bufferSize = 2048, uint channels = 2) {
 		this._alc = ALContext.GetApi();
 		this._al  = AL.GetApi();
@@ -59,7 +59,7 @@ public unsafe class OpenALBackend : IAudioBackend {
 		}
 
 		this._buffer = this._al.GenBuffer();
-		
+
 		this._this = GCHandle.Alloc(this, GCHandleType.Normal);
 
 		switch (channels) {
@@ -76,7 +76,7 @@ public unsafe class OpenALBackend : IAudioBackend {
 
 		// Fill the buffer with silence
 		byte[] buffer = new byte[bufferSize * channels * sizeof(ushort)];
-		fixed(void* data = buffer)
+		fixed (void* data = buffer)
 			this._al.BufferData(
 				this._buffer,
 				this._bufferFormat,
@@ -100,16 +100,16 @@ public unsafe class OpenALBackend : IAudioBackend {
 		this._source = this._al.GenSource();
 		this._al.SetSourceProperty(this._source, SourceInteger.Buffer, this._buffer);
 		this._al.SourcePlay(this._source);
-		
+
 		return SoLoudStatus.Ok;
 	}
-	
+
 	private void CleanupFunc(SoLoud asoloud) {
 		this._this.Free();
-		
+
 		this._al.DeleteBuffer(this._buffer);
 		this._al.DeleteSource(this._source);
-		
+
 		this._al.Dispose();
 		this._alc.Dispose();
 	}
