@@ -16,14 +16,17 @@ public static class Program {
 
 		IAudioBackend? backend = null;
 
-		Console.Write($"Open[A]L or [S]DL2? ");
-		char input = char.ToLower(Console.ReadKey().KeyChar);
+		while (backend == null) {
+			Console.Write($"Open[A]L or [S]DL2? ");
+			char input = char.ToLower(Console.ReadKey().KeyChar);
+			Console.Write(Environment.NewLine);
 
-		backend = input switch {
-			'a' => new OpenALBackend(soLoud),
-			's' => throw new NotImplementedException(),
-			_   => backend
-		};
+			backend = input switch {
+				'a' => new OpenALBackend(soLoud),
+				's' => throw new NotImplementedException(),
+				_   => backend
+			};
+		}
 
 		backend.Init();
 
@@ -43,6 +46,7 @@ public static class Program {
 		soLoud.setVolume(handle, 0.1f);
 		soLoud.setLooping(handle, true);
 
+		Console.WriteLine("Press return to exit.");
 		Console.ReadLine();
 
 		streamedStream.Dispose();
