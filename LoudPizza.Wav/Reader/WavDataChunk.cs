@@ -18,7 +18,8 @@ public struct WavDataChunk {
 	/// </summary>
 	public int ChunkSize;
 	/// <summary>
-	/// Whether or not the data chunk is silent (eg all 127 for 8-bit PCM and all 0 for 16-bit PCM)
+	/// Whether or not the data chunk is silent
+	/// (specified to maintain the same value as the previous data sample, or the value of the next data sample, if there is no previous data sample)
 	/// <br/>
 	/// This only occurs with `slnt` chunks
 	/// </summary>

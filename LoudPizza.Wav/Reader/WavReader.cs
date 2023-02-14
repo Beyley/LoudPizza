@@ -110,8 +110,8 @@ public unsafe class WavReader : IDisposable {
 			long chunkSamplesToRead = samplesRead * this.Channels;
 
 			//Mark that we have read some samples
-			samplesToRead        -= (uint)samplesRead;
-			read                 += (uint)samplesRead;
+			samplesToRead       -= (uint)samplesRead;
+			read                += (uint)samplesRead;
 			this.SamplePosition += (int)samplesRead;
 
 			//Convert the data into the correct un-interlaced float format
@@ -167,8 +167,7 @@ public unsafe class WavReader : IDisposable {
 
 								int sample = b0 | (b1 << 8) | (b2 << 16);
 
-								// extend the sign to 32 bits
-								sample = (int)((sample << 8) & 0xFFFFFF00);
+								sample <<= 8;
 
 								buffer[(int)(i + channel * channelStride)] = sample / (float)0x7fffffff;
 
@@ -292,122 +291,148 @@ public unsafe class WavReader : IDisposable {
 		return waveChunkSize;
 	}
 
+	private void SkipExtraData(int amount) {
+		//If we can seek
+		if (this._stream.CanSeek)
+			//Seek the stream past the chunk to the next chunk
+			this._stream.Seek(amount, SeekOrigin.Current);
+		else
+			//Otherwise, read the chunk into a buffer we are about to throw away
+			EnsureRead(this._stream.Read(new byte[amount]), amount);
+	}
+	
+	private void ReadChunk(ref int sampleCount) {
+		byte[] identifierBytes = new byte[4];
+
+		//Read the identifier
+		if (this._stream.Read(identifierBytes) < 4)
+			ThrowInvalidFile();
+
+		//Get the identifier as a string
+		string identifier = Encoding.UTF8.GetString(identifierBytes);
+
+		int chunkByteSize = this._reader.ReadInt32();
+
+		//Make sure chunkByteSize is word aligned
+		if (chunkByteSize % 2 != 0)
+			chunkByteSize++;
+
+		if (identifier == "LIST") {
+			long posStart = this._stream.Position;
+			long posEnd   = posStart + chunkByteSize;
+			
+			//Read the list identifier
+			if (this._stream.Read(identifierBytes) < 4)
+				ThrowInvalidFile();	
+			
+			//Get the identifier as a string
+			identifier = Encoding.UTF8.GetString(identifierBytes);
+
+			if (identifier != "wavl") {
+				//Skip the list minus the identifier
+				this.SkipExtraData(chunkByteSize - 4);
+				return;
+			}
+			
+			//until we are at the end of the list,
+			while (this._stream.Position < posEnd) {
+				//Read the next chunk
+				this.ReadChunk(ref sampleCount);
+			}
+			return;
+		}
+
+		//Specifies the format of the audio data
+		if (identifier == "fmt ") {
+			//Audio format, 1 for PCM, 3 for IEEE float
+			this.Format = (WavFormat)this._reader.ReadInt16();
+
+			if (!Enum.IsDefined(this.Format))
+				throw new Exception($"Unknown WAV format! fmt: {(int)this.Format}");
+
+			//The number of channels, ex: 2 for stereo
+			this.Channels = this._reader.ReadInt16();
+
+			//Sample rate of the data
+			this.SampleRate = this._reader.ReadInt32();
+
+			//The byte rate of the data
+			int byteRate = this._reader.ReadInt32();
+
+			//The block align of the data
+			short blockAlign = this._reader.ReadInt16();
+
+			//The bits per sample of the data
+			this.BitsPerSample = this._reader.ReadInt16();
+
+			//If the length of the format data is greater than 16, then we have extra data, so lets skip past it
+			this.SkipExtraData(chunkByteSize - 16);
+		}
+		//A chunk containing audio data
+		else if (identifier == "data") {
+			WavDataChunk chunk = new WavDataChunk {
+				FileOffset = (int)this._stream.Position,
+				ChunkSize  = chunkByteSize,
+				//The sample count of the chunk, disregarding the number of channels
+				//(since that is what IAudioStream.Seek works with)
+				SampleCount = chunkByteSize / (this.BitsPerSample / 8) / this.Channels,
+				SampleStart = sampleCount
+			};
+
+			//Add the sample count to the total sample count
+			sampleCount += chunk.SampleCount;
+
+			//Add the chunk to the dictionary
+			this._dataChunks[chunk.SampleStart] = chunk;
+
+			//Skip the chunk data
+			this.SkipExtraData(chunkByteSize);
+		}
+		//indicates a completely silent chunk
+		else if (identifier == "slnt") {
+			int silentSamples = this._reader.ReadInt32();
+			
+			WavDataChunk chunk = new WavDataChunk {
+				FileOffset = (int)this._stream.Position,
+				ChunkSize  = chunkByteSize,
+				SampleCount  = silentSamples / this.Channels,
+				SampleStart = sampleCount, 
+				//This is a silent chunk, mark it as such
+				Silent = true
+			};
+			
+			//Add the sample count to the total sample count
+			sampleCount += chunk.SampleCount;
+		
+			//Add the silent chunk to the dictionary
+			this._dataChunks[chunk.SampleStart] = chunk;
+			
+			//Skip any extra data
+			this.SkipExtraData(chunkByteSize - 4);
+		}
+		//junk data used for alignment
+		else if (identifier == "JUNK") {
+			//Skip the chunk data
+			this.SkipExtraData(chunkByteSize);
+		}
+		else {
+#if DEBUG
+			Console.WriteLine($"Unknown chunk identifier: {identifier} (size: {chunkByteSize})");
+#endif
+
+			//Skip the chunk data
+			this.SkipExtraData(chunkByteSize);
+		}
+	}
+
 	private void ParseFullFile() {
 		int waveChunkSize = this.ParseHeader();
 
-		//Array to store our magics and identifiers
-		byte[] identifierBytes = new byte[4];
-
 		int sampleCount = 0;
-
-		void skipExtraData(int amount) {
-			//If we can seek
-			if (this._stream.CanSeek)
-				//Seek the stream past the chunk to the next chunk
-				this._stream.Seek(amount, SeekOrigin.Current);
-			else
-				//Otherwise, read the chunk into a buffer we are about to throw away
-				EnsureRead(this._stream.Read(new byte[amount]), amount);
-		}
 
 		//Read all chunks in the file
 		while (this._stream.Position + 4 < this._stream.Length) {
-			//Read the identifier
-			if (this._stream.Read(identifierBytes) < 4)
-				ThrowInvalidFile();
-
-			//Get the identifier as a string
-			string identifier = Encoding.UTF8.GetString(identifierBytes);
-
-			//Read the size of the sub-chunk
-			int chunkByteSize = this._reader.ReadInt32();
-
-			//Make sure chunkByteSize is word aligned
-			if (chunkByteSize % 2 != 0)
-				chunkByteSize++;
-
-			//Specifies the format of the audio data
-			if (identifier == "fmt ") {
-				//Audio format, 1 for PCM, 3 for IEEE float
-				this.Format = (WavFormat)this._reader.ReadInt16();
-
-				if (!Enum.IsDefined(this.Format))
-					throw new Exception($"Unknown WAV format! fmt: {(int)this.Format}");
-
-				//The number of channels, ex: 2 for stereo
-				this.Channels = this._reader.ReadInt16();
-
-				//Sample rate of the data
-				this.SampleRate = this._reader.ReadInt32();
-
-				//The byte rate of the data
-				int byteRate = this._reader.ReadInt32();
-
-				//The block align of the data
-				short blockAlign = this._reader.ReadInt16();
-
-				//The bits per sample of the data
-				this.BitsPerSample = this._reader.ReadInt16();
-
-				//If the length of the format data is greater than 16, then we have extra data, so lets skip past it
-				skipExtraData(chunkByteSize - 16);
-			}
-			//A chunk containing audio data
-			else if (identifier == "data") {
-				WavDataChunk chunk = new WavDataChunk {
-					FileOffset = (int)this._stream.Position,
-					ChunkSize  = chunkByteSize,
-					//The sample count of the chunk, disregarding the number of channels
-					//(since that is what IAudioStream.Seek works with)
-					SampleCount = chunkByteSize / (this.BitsPerSample / 8) / this.Channels,
-					SampleStart = sampleCount
-				};
-
-				//Add the sample count to the total sample count
-				sampleCount += chunk.SampleCount;
-
-				//Add the chunk to the dictionary
-				this._dataChunks[chunk.SampleStart] = chunk;
-
-				//Skip the chunk data
-				skipExtraData(chunkByteSize);
-			}
-			//indicates a completely silent chunk
-			//re-enable this code once `wavl` is handled properly
-			// else if (identifier == "slnt") {
-			// 	int silentSamples = this._reader.ReadInt32();
-			// 	
-			// 	WavDataChunk chunk = new WavDataChunk {
-			// 		FileOffset = (int)this._stream.Position,
-			// 		ChunkSize  = chunkByteSize,
-			// 		SampleCount  = silentSamples / this.Channels,
-			// 		SampleOffset = sampleCount, 
-			// 		//This is a silent chunk, mark it as such
-			// 		Silent = true
-			// 	};
-			// 	
-			// 	//Add the sample count to the total sample count
-			// 	sampleCount += chunk.SampleCount;
-			//
-			// 	//Add the silent chunk to the dictionary
-			// 	this._dataChunks[chunk.SampleOffset] = chunk;
-			// 	
-			// 	//Skip any extra data
-			// 	skipExtraData(chunkByteSize - 4);
-			// }
-			//junk data used for alignment
-			else if (identifier == "JUNK") {
-				//Skip the chunk data
-				skipExtraData(chunkByteSize);
-			}
-			else {
-#if DEBUG
-				Console.WriteLine($"Unknown chunk identifier: {identifier} (size: {chunkByteSize})");
-#endif
-
-				//Skip the chunk data
-				skipExtraData(chunkByteSize);
-			}
+			this.ReadChunk(ref sampleCount);
 		}
 
 		if (this._dataChunks.Count == 0)
