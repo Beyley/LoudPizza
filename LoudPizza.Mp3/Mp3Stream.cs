@@ -10,30 +10,29 @@ namespace LoudPizza
     {
         // private Mp3StreamInstance mp3Instance;
 
-        public MpegFile mpegFile;
+        public           MpegFile mpegFile;
+        private readonly Stream   _stream;
+        private readonly bool     _leaveOpen;
 
         public Mp3Stream(SoLoud soLoud, Stream stream, bool leaveOpen) {
-            mpegFile = new MpegFile(stream, leaveOpen);
+            this._stream    = stream;
+            this._leaveOpen = leaveOpen;
             
-            this.Channels   = (uint)this.mpegFile.Channels;
-            this.SampleRate = (uint)this.mpegFile.SampleRate;
-
+            mpegFile = new MpegFile(stream, true);
+            
             // TODO: allow multiple streams from the intial stream by buffering
             // mp3Instance = new Mp3StreamInstance(this, mpegFile);
         }
         
         public void Dispose() {
-            mpegFile.Dispose();
+            this._stream.Close();
+            this.mpegFile.Dispose();
         }
         
-        public uint Channels {
-            get;
-        }
-        
-        public float SampleRate {
-            get;
-        }
-        
+        public uint Channels => (uint)this.mpegFile.Channels;
+
+        public float SampleRate => this.mpegFile.SampleRate;
+
         public float RelativePlaybackSpeed => 1;
 
         public unsafe uint GetAudio(Span<float> buffer, uint samplesToRead, uint channelStride) {
@@ -72,9 +71,14 @@ namespace LoudPizza
             return this.mpegFile.CanSeek;
         }
         
-        public SoLoudStatus Seek(ulong samplePosition, Span<float> scratch, AudioSeekFlags flags, out ulong resultPosition) {
-            this.mpegFile.Position = (long)samplePosition * this.Channels;
-            resultPosition = (ulong)this.mpegFile.Position;
+        public unsafe SoLoudStatus Seek(ulong samplePosition, Span<float> scratch, AudioSeekFlags flags, out ulong resultPosition) {
+            this.mpegFile.Dispose();
+            this.mpegFile = new MpegFile(this._stream, true);
+
+            // this.mpegFile.Position = (long)samplePosition * sizeof(float) * this.Channels;
+            this.mpegFile.Time = TimeSpan.FromSeconds(60);
+
+            resultPosition = (ulong)(this.mpegFile.Time.TotalSeconds * this.SampleRate);
             
             return SoLoudStatus.Ok;
             // long signedSamplePosition = (long)samplePosition;

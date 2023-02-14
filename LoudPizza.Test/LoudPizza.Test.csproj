@@ -12,6 +12,7 @@
       <ProjectReference Include="..\LoudPizza.Backends.OpenAL\LoudPizza.Backends.OpenAL.csproj" />
       <ProjectReference Include="..\LoudPizza.Backends.SDL2\LoudPizza.Backends.SDL2.csproj" />
       <ProjectReference Include="..\LoudPizza.Mp3\LoudPizza.Mp3.csproj" />
+      <ProjectReference Include="..\LoudPizza.Wav\LoudPizza.Wav.csproj" />
       <ProjectReference Include="..\LoudPizza\LoudPizza.csproj" />
     </ItemGroup>
 

@@ -6,12 +6,24 @@ using LoudPizza.Sources;
 using LoudPizza.Sources.Streaming;
 using LoudPizza.Test.Shared;
 using LoudPizza.Vorbis;
+using LoudPizza.Wav;
+using LoudPizza.Wav.Reader;
 using NVorbis;
 
 namespace LoudPizza.Test;
 
 public static class Program {
 	public static unsafe void Main(string[] args) {
+		// WavReader reader = new WavReader(File.OpenRead("badapple.wav"), false);
+		//
+		// float[] read = new float[10000];
+		// reader.ReadSamples(read, 1000, 1000);
+		//
+		// Stopwatch startNew = Stopwatch.StartNew();
+		// reader.ReadSamples(read, 1000, 1000);
+		// //print the ms taken
+		// Console.WriteLine(startNew.Elapsed.TotalMilliseconds);
+		// return;
 		SoLoud soLoud = new SoLoud();
 
 		IAudioBackend? backend = null;
@@ -42,9 +54,10 @@ public static class Program {
 		// VorbisReader reader = new VorbisReader("badapple.ogg");
 		// reader.Initialize();
 
-		// VorbisAudioStream   vorbisStream   = new VorbisAudioStream(reader);
-		Mp3Stream           vorbisStream   = new Mp3Stream(soLoud, File.OpenRead("badapple.mp3"), false);
-		StreamedAudioStream streamedStream = new StreamedAudioStream(streamer, vorbisStream);
+		// VorbisAudioStream   audioStream   = new VorbisAudioStream(reader);
+		// Mp3Stream           audioStream   = new Mp3Stream(soLoud, File.OpenRead("badapple.mp3"), false);
+		WavAudioStream           audioStream   = new WavAudioStream(File.OpenRead("animariot.wav"), false);
+		StreamedAudioStream streamedStream = new StreamedAudioStream(streamer, audioStream);
 		streamer.RegisterStream(streamedStream);
 
 		AudioStream stream = new AudioStream(soLoud, streamedStream);
@@ -53,14 +66,14 @@ public static class Program {
 		soLoud.setVolume(handle, 0.05f);
 		soLoud.setLooping(handle, true);
 		//Seek to 60 seconds in (48kHz * 2 channels * 60 seconds)
-		soLoud.seek(handle, (ulong)(vorbisStream.SampleRate * 60), AudioSeekFlags.None);
+		soLoud.seek(handle, (ulong)(audioStream.SampleRate * 60), AudioSeekFlags.None);
 
-		// while (true) {
-		// 	Time streamTime = soLoud.getInterpolatedTimePosition(handle);
-		// 	Console.WriteLine($"streamTime: {streamTime.Seconds * 1000d}ms");
-		// 	
-		// 	Thread.Sleep(1);
-		// }
+		while (true) {
+			Time streamTime = soLoud.getStreamTimePosition(handle);
+			Console.WriteLine($"streamTime: {streamTime.Seconds * 1000d}ms");
+			
+			Thread.Sleep(1);
+		}
 		
 		Console.WriteLine("Press return to exit.");
 		Console.ReadLine();

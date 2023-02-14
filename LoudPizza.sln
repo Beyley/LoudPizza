@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLayer", "NLayer\NLayer\NLayer.csproj", "{8ADA7751-FE21-424A-A774-AB99D1288869}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoudPizza.Wav", "LoudPizza.Wav\LoudPizza.Wav.csproj", "{AAF74227-D445-4FAD-BA74-F76180D1456D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{8ADA7751-FE21-424A-A774-AB99D1288869}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ADA7751-FE21-424A-A774-AB99D1288869}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8ADA7751-FE21-424A-A774-AB99D1288869}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAF74227-D445-4FAD-BA74-F76180D1456D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAF74227-D445-4FAD-BA74-F76180D1456D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAF74227-D445-4FAD-BA74-F76180D1456D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAF74227-D445-4FAD-BA74-F76180D1456D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
