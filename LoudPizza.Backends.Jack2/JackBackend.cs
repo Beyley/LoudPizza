@@ -25,10 +25,14 @@ public unsafe class JackBackend : IAudioBackend {
 	public SoLoudStatus Init(uint sampleRate = 48000, uint bufferSize = 2048, uint channels = 2) {
 		SoLoud.mBackendCleanupFunc = Cleanup;
 
+		//Open the Jack client
 		this._client = this._jack.ClientOpen("SoLoud", JackOptions.JackNullOption, null);
 		if (this._client == null)
 			return SoLoudStatus.UnknownError;
 
+		//Force the sample rate to the one Jack uses
+		sampleRate = this._jack.GetSampleRate(this._client);
+		
 		this._portCount = channels;
 		
 		//Create an array of all the ports
@@ -48,11 +52,13 @@ public unsafe class JackBackend : IAudioBackend {
 		if (this._jack.SetProcessCallback(this._client, new PfnJackProcessCallback(Callback), (void*)GCHandle.ToIntPtr(this._this)) != 0)
 			return SoLoudStatus.UnknownError;
 
+		//Get all the physical audio ports
 		byte** audioPorts = this._jack.GetPorts(this._client, (byte*)null, Jack.DefaultAudioType, (uint)(JackPortFlags.JackPortIsPhysical | JackPortFlags.JackPortIsInput));
 		if (audioPorts == null)
 			//Return an error if we cannot find any physical playback ports
 			return SoLoudStatus.UnknownError;
 
+		//Connect all the ports
 		for (int i = 0; audioPorts[i] != null; i++) {
 			int ret = this._jack.Connect(this._client, this._jack.PortName(this._ports[i % channels]), audioPorts[i]);
 			if (ret is not 0 and not 17)
@@ -63,7 +69,7 @@ public unsafe class JackBackend : IAudioBackend {
 		SoLoud.postinit_internal(sampleRate, bufferSize, channels);
 		SoLoud.mBackendString = "JACK";
 
-		//Activate the client
+		//Activate the client, which starts Jack calling our callback
 		if (this._jack.Activate(this._client) != 0)
 			return SoLoudStatus.UnknownError;
 		
@@ -74,12 +80,12 @@ public unsafe class JackBackend : IAudioBackend {
 		GCHandle    handle = GCHandle.FromIntPtr((IntPtr)usrData);
 		JackBackend @this  = (JackBackend)handle.Target!;
 		
-		// uint dataLength = frames * @this._portCount;
-		// uint samples    = frames;
-
+		//Mix without copying
 		@this.SoLoud.mix_without_copy(frames);
 		for (uint channel = 0; channel < @this._portCount; channel++) {
+			//Get the buffer for the port
 			float* buf = (float*)@this._jack.PortGetBuffer(@this._ports[channel], frames);
+			//Copy the de-interlaced samples of a specific channel into the buffer
 			@this.SoLoud.copy_deinterlaced_channel_samples(buf, frames, channel);
 		}
 
@@ -87,6 +93,7 @@ public unsafe class JackBackend : IAudioBackend {
 	}
 
 	private void Cleanup(SoLoud soLoud) {
+		//Close the client
 		this._jack.ClientClose(this._client);
 	}
 }
