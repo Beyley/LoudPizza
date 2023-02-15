@@ -16,16 +16,6 @@ namespace LoudPizza.Test;
 
 public static class Program {
 	public static unsafe void Main(string[] args) {
-		// WavReader reader = new WavReader(File.OpenRead("badapple.wav"), false);
-		//
-		// float[] read = new float[10000];
-		// reader.ReadSamples(read, 1000, 1000);
-		//
-		// Stopwatch startNew = Stopwatch.StartNew();
-		// reader.ReadSamples(read, 1000, 1000);
-		// //print the ms taken
-		// Console.WriteLine(startNew.Elapsed.TotalMilliseconds);
-		// return;
 		SoLoud soLoud = new SoLoud();
 
 		IAudioBackend? backend = null;
@@ -55,7 +45,7 @@ public static class Program {
 		AudioStreamer streamer = new AudioStreamer();
 		streamer.Start();
 
-		// VorbisReader reader = new VorbisReader("badapple.ogg");
+		// VorbisReader reader = new VorbisReader("animariot.ogg");
 		// reader.Initialize();
 
 		// VorbisAudioStream   audioStream   = new VorbisAudioStream(reader);

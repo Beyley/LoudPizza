@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLayer", "NLayer\NLayer\NLa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoudPizza.Wav", "LoudPizza.Wav\LoudPizza.Wav.csproj", "{AAF74227-D445-4FAD-BA74-F76180D1456D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoudPizza.Backends.Null", "LoudPizza.Backends.Null\LoudPizza.Backends.Null.csproj", "{AEFED0DA-D019-4499-A20C-76913F6AC955}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoudPizza.Backends.NoSound", "LoudPizza.Backends.NoSound\LoudPizza.Backends.NoSound.csproj", "{AEFED0DA-D019-4499-A20C-76913F6AC955}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoudPizza.Backends.Jack2", "LoudPizza.Backends.Jack2\LoudPizza.Backends.Jack2.csproj", "{AD4A223A-EEC4-472D-A8D0-D7BB8BAA15B8}"
 EndProject
