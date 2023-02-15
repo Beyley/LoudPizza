@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using LoudPizza.Backends.Null;
 using LoudPizza.Backends.OpenAL;
 using LoudPizza.Backends.SDL2;
 using LoudPizza.Core;
@@ -29,13 +30,14 @@ public static class Program {
 		IAudioBackend? backend = null;
 
 		while (backend == null) {
-			Console.Write($"Open[A]L or [S]DL2? ");
+			Console.Write($"Open[A]L, [S]DL2, [N]ull? ");
 			char input = char.ToLower(Console.ReadKey().KeyChar);
 			Console.Write(Environment.NewLine);
 
 			backend = input switch {
 				'a' => new OpenALBackend(soLoud),
 				's' => new SDL2Backend(soLoud),
+				'n' => new NullBackend(soLoud),
 				_   => backend
 			};
 		}

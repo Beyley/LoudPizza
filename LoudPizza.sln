@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLayer", "NLayer\NLayer\NLa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoudPizza.Wav", "LoudPizza.Wav\LoudPizza.Wav.csproj", "{AAF74227-D445-4FAD-BA74-F76180D1456D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoudPizza.Backends.Null", "LoudPizza.Backends.Null\LoudPizza.Backends.Null.csproj", "{AEFED0DA-D019-4499-A20C-76913F6AC955}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{AAF74227-D445-4FAD-BA74-F76180D1456D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAF74227-D445-4FAD-BA74-F76180D1456D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAF74227-D445-4FAD-BA74-F76180D1456D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEFED0DA-D019-4499-A20C-76913F6AC955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEFED0DA-D019-4499-A20C-76913F6AC955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEFED0DA-D019-4499-A20C-76913F6AC955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEFED0DA-D019-4499-A20C-76913F6AC955}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,5 +85,6 @@ Global
 		{A91A525F-7265-4E89-A64F-39E793B26C59} = {1A402FCD-AF30-436A-AEB6-30D1C65C7D14}
 		{86DA4DDF-E3D3-41CC-AF74-A6E1E8F06064} = {1A402FCD-AF30-436A-AEB6-30D1C65C7D14}
 		{8ADA7751-FE21-424A-A774-AB99D1288869} = {5CCF04E6-FC44-4C04-BF7B-31C1D713FE7B}
+		{AEFED0DA-D019-4499-A20C-76913F6AC955} = {1A402FCD-AF30-436A-AEB6-30D1C65C7D14}
 	EndGlobalSection
 EndGlobal
