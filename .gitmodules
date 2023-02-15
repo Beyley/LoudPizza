@@ -6,4 +6,4 @@
 	url = https://github.com/TechnologicalPizza/NVorbis
 [submodule "Jack"]
 	path = Jack
-	url = https://github.com/beyley/Jack
+	url = https://github.com/Beyley/JackCS
