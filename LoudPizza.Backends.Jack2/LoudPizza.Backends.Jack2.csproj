@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Jack\Silk.NET.Community.Jack\Silk.NET.Community.Jack\Silk.NET.Community.Jack.csproj" />
+      <ProjectReference Include="..\LoudPizza.Backends.Shared\LoudPizza.Backends.Shared.csproj" />
+    </ItemGroup>
+
+</Project>

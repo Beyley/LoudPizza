@@ -4,3 +4,6 @@
 [submodule "NVorbis"]
 	path = NVorbis
 	url = https://github.com/TechnologicalPizza/NVorbis
+[submodule "Jack"]
+	path = Jack
+	url = https://github.com/beyley/Jack

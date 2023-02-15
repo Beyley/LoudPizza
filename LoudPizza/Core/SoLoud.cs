@@ -280,6 +280,31 @@ namespace LoudPizza.Core
         }
 
         /// <summary>
+        /// Mixes the samples into the scratch buffer. Called by the back-end, or user with null driver.
+        /// </summary>
+        /// <param name="aSamples">The samples to copy</param>
+        public void mix_without_copy(uint aSamples)
+        {
+            uint stride = (aSamples + VECTOR_ALIGNMENT) & ~VECTOR_ALIGNMENT;
+            mix_internal(aSamples, stride);
+        }
+
+        /// <summary>
+        /// Copies de-interlaced samples of one channel from the scratch buffer to the output buffer.
+        /// </summary>
+        /// <param name="aBuffer">The buffer to copy to</param>
+        /// <param name="aSamples">The samples to copy</param>
+        /// <param name="aChannel">The channel to copy</param>
+        public void copy_deinterlaced_channel_samples(float* aBuffer, uint aSamples, uint aChannel) {
+            uint stride = (aSamples + VECTOR_ALIGNMENT) & ~VECTOR_ALIGNMENT;
+            
+            //Copy the chunk of the scratch buffer to the output buffer
+            this.mScratch
+                .AsSpan().Slice((int)(aChannel * stride), (int)aSamples)
+                .CopyTo(new Span<float>(aBuffer, (int)aSamples)); 
+        }
+
+        /// <summary>
         /// Returns mixed 16-bit signed integer samples in buffer. Called by the back-end, or user with null driver.
         /// </summary>
         public void mixSigned16(short* aBuffer, uint aSamples)
