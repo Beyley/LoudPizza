@@ -22,6 +22,7 @@ public unsafe class JackBackend : IAudioBackend {
 	public SoLoud SoLoud {
 		get;
 	}
+	
 	public SoLoudStatus Init(uint sampleRate = 48000, uint bufferSize = 2048, uint channels = 2) {
 		SoLoud.mBackendCleanupFunc = Cleanup;
 
@@ -32,6 +33,9 @@ public unsafe class JackBackend : IAudioBackend {
 
 		//Force the sample rate to the one Jack uses
 		sampleRate = this._jack.GetSampleRate(this._client);
+
+		//Set the buffer size of the client
+		this._jack.SetBufferSize(this._client, bufferSize);
 		
 		this._portCount = channels;
 		
