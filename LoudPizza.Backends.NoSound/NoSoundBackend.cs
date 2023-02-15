@@ -4,8 +4,8 @@ using LoudPizza.Test.Shared;
 
 namespace LoudPizza.Backends.Null;
 
-public class NullBackend : IAudioBackend {
-	public NullBackend(SoLoud soLoud) {
+public class NoSoundBackend : IAudioBackend {
+	public NoSoundBackend(SoLoud soLoud) {
 		this.SoLoud = soLoud;
 	}
 	

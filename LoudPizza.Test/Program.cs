@@ -31,14 +31,14 @@ public static class Program {
 		IAudioBackend? backend = null;
 
 		while (backend == null) {
-			Console.Write($"Open[A]L, [S]DL2, [J]ack, [N]ull? ");
+			Console.Write($"Open[A]L, [S]DL2, [J]ack, [N]oSound? ");
 			char input = char.ToLower(Console.ReadKey().KeyChar);
 			Console.Write(Environment.NewLine);
 
 			backend = input switch {
 				'a' => new OpenALBackend(soLoud),
 				's' => new SDL2Backend(soLoud),
-				'n' => new NullBackend(soLoud),
+				'n' => new NoSoundBackend(soLoud),
 				'j' => new JackBackend(soLoud),
 				_   => backend
 			};
