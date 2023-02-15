@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
+using JackCS;
 using LoudPizza.Core;
 using LoudPizza.Test.Shared;
-using Silk.NET.Community.Jack;
 
 namespace LoudPizza.Backends.Jack2;
 
