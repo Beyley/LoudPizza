@@ -14,13 +14,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Silk.NET.OpenAL" Version="2.17.0-build3011.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Silk.NET.OpenAL.Extensions.Soft">
-        <HintPath>..\Silk.NET.OpenAL.Extensions.Soft.dll</HintPath>
-      </Reference>
+        <PackageReference Include="Silk.NET.OpenAL" Version="2.17.0-build3117.0" />
+        <PackageReference Include="Silk.NET.OpenAL.Extensions.Soft" Version="2.17.0-build3117.0" />
     </ItemGroup>
 
 </Project>
