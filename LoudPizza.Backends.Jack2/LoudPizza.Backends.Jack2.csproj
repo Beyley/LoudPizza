@@ -8,8 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Jack\JackCS\JackCS\JackCS.csproj" />
       <ProjectReference Include="..\LoudPizza.Backends.Shared\LoudPizza.Backends.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="JackCS" Version="1.0.0" />
     </ItemGroup>
 
 </Project>
